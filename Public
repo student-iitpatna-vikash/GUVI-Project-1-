@@ -1,0 +1,14 @@
+Simple Calculator with Logs
+A web-based calculator with persistent calculation history using Node.js, Express, and MySQL.
+
+
+Features
+Basic arithmetic operations
+Calculation history stored in MySQL
+Responsive UI with history panel
+
+Project Structure
+calculator/
+  public/         # Frontend (HTML, CSS, JS)
+  backend/        # Backend (Node.js, Express, MySQL)
+  
