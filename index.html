@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Calculator with Logs</title>
+  <style>
+    body { font-family: Arial; padding: 30px; }
+    #calculator { width: 220px; }
+    #display { height: 40px; margin-bottom: 10px; font-size: 20px; }
+    .btn { width: 50px; height: 50px; margin: 2px; font-size: 18px; }
+    #history { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div id="calculator">
+    <input type="text" id="display" readonly />
+    <div>
+      <button class="btn" onclick="press('7')">7</button>
+      <button class="btn" onclick="press('8')">8</button>
+      <button class="btn" onclick="press('9')">9</button>
+      <button class="btn" onclick="press('/')">/</button>
+    </div>
+    <div>
+      <button class="btn" onclick="press('4')">4</button>
+      <button class="btn" onclick="press('5')">5</button>
+      <button class="btn" onclick="press('6')">6</button>
+      <button class="btn" onclick="press('*')">*</button>
+    </div>
+    <div>
+      <button class="btn" onclick="press('1')">1</button>
+      <button class="btn" onclick="press('2')">2</button>
+      <button class="btn" onclick="press('3')">3</button>
+      <button class="btn" onclick="press('-')">-</button>
+    </div>
+    <div>
+      <button class="btn" onclick="press('0')">0</button>
+      <button class="btn" onclick="press('.')">.</button>
+      <button class="btn" onclick="calculate()">=</button>
+      <button class="btn" onclick="press('+')">+</button>
+    </div>
+    <button class="btn" onclick="clearDisplay()">C</button>
+  </div>
+
+  <div id="history">
+    <h3>Calculation History</h3>
+    <ul id="historyList"></ul>
+  </div>
+
+  <script>
+    let display = document.getElementById("display");
+
+    function press(value) {
+      display.value += value;
+    }
+
+    function clearDisplay() {
+      display.value = "";
+    }
+
+    function calculate() {
+      try {
+        const expression = display.value;
+        const result = eval(expression);
+        display.value = result;
+        saveToHistory(expression, result);
+      } catch {
+        alert("Invalid expression");
+      }
+    }
+
+    async function saveToHistory(expression, result) {
+      await fetch("http://localhost:8080/api/calculate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ expression, result })
+      });
+      fetchHistory();
+    }
+
+    async function fetchHistory() {
+      const res = await fetch("http://localhost:8080/api/history");
+      const data = await res.json();
+      const list = document.getElementById("historyList");
+      list.innerHTML = "";
+      data.forEach(item => {
+        list.innerHTML += `<li>${item.expression} = ${item.result}</li>`;
+      });
+    }
+
+    window.onload = fetchHistory;
+  </script>
+</body>
+</html>
